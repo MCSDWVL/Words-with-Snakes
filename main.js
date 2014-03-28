@@ -1,6 +1,7 @@
 var gNeedsRedrawn = true;
 var INTERVAL_TIME = 20;
 var TIME_BETWEEN_SNAKE_MOVES = 100;
+var START_AS_LETTER_PERCENT = 5;
 var TIME_BETWEEN_LETTERS = 4000;
 var gGameBoard;
 var gSnakeManager;
@@ -88,6 +89,13 @@ function Init()
 			TIME_BETWEEN_SNAKE_MOVES = 1000 / asInt;
 	}
 
+	if (urlVars["pct"])
+	{
+		var asInt = parseInt(urlVars["pct"]);
+		if (!isNaN(asInt))
+			START_AS_LETTER_PERCENT = asInt / 100.0;
+	}
+
 	// reset game state
 	gGameOver = false;
 	gScore = 0;
@@ -108,7 +116,7 @@ function Init()
 	gSnakeManager.m_snakePieces.push(0);
 
 	// init 5% of the board to letters
-	for (var i = 0; i < NUM_ROWS * NUM_COLS * .05; ++i)
+	for (var i = 0; i < NUM_ROWS * NUM_COLS * START_AS_LETTER_PERCENT; ++i)
 	{
 		AddLetter();
 	}
