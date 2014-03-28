@@ -12,6 +12,7 @@ var gScore = 0;
 var gMultiplier = 1;
 var gLetters = "";
 var gStatus = "";
+var gAlreadyMovedSinceLastUpdate = false;
 
 var regOnce = false;
 
@@ -154,9 +155,11 @@ function Init()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function MoveSnake()
+function MoveSnake(force)
 {
-	gSnakeManager.MoveSnake();
+	if (force || !gAlreadyMovedSinceLastUpdate)
+		gSnakeManager.MoveSnake();
+	gAlreadyMovedSinceLastUpdate = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -228,14 +231,21 @@ function ev_keydown(ev)
 	}
 	if (ev.keyCode >= DIRECTION.LEFT && ev.keyCode <= DIRECTION.DOWN)
 	{
-		ev.preventDefault()
+		ev.preventDefault();
 		gSnakeManager.ChangeDirection(ev.keyCode);
+		if (gSnakeManager.m_lastDirectionMoved != ev.keyCode)
+		{
+			MoveSnake(true);
+			gAlreadyMovedSinceLastUpdate = true;
+			gNeedsRedrawn = true;
+		}
 	}
 	else if (ev.keyCode == 88 || ev.keyCode == 8) // x or backspace
 	{
 		ev.preventDefault();
 		gLetters = gLetters.substring(0, gLetters.length - 1);
 		gMultiplier = 1;
+		gNeedsRedrawn = true;
 	}
 	else if (ev.keyCode == 32) // space
 	{
