@@ -81,6 +81,12 @@ function Init()
 		alert(urlVars["word"] + " " + wordOk + " " + getScore(urlVars["word"]));
 	}
 
+	if (urlVars["speed"])
+	{
+		var asInt = parseInt(urlVars["speed"]);
+		if (!isNaN(asInt))
+			TIME_BETWEEN_SNAKE_MOVES = 1000 / asInt;
+	}
 
 	// reset game state
 	gGameOver = false;
@@ -212,12 +218,20 @@ function ev_keydown(ev)
 		Init();
 		return;
 	}
-	if (ev.keyCode >= DIRECTION.LEFT && ev.keyCode <= DIRECTION.DOWN) 
+	if (ev.keyCode >= DIRECTION.LEFT && ev.keyCode <= DIRECTION.DOWN)
 	{
+		ev.preventDefault()
 		gSnakeManager.ChangeDirection(ev.keyCode);
 	}
-	else if(ev.keyCode == 32) // space
+	else if (ev.keyCode == 88 || ev.keyCode == 8) // x or backspace
 	{
+		ev.preventDefault();
+		gLetters = gLetters.substring(0, gLetters.length - 1);
+		gMultiplier = 1;
+	}
+	else if (ev.keyCode == 32) // space
+	{
+		ev.preventDefault();
 		var wordOk = checkDictionary(gLetters);
 		var validWord = checkDictionary(gLetters);
 		if (validWord)
@@ -229,7 +243,7 @@ function ev_keydown(ev)
 			if (lengthMultiplier > 1)
 				multiplierString += " * " + lengthMultiplier + " length multiplier";
 
-			gStatus = gLetters + " scores " + (Math.round(score*100)/100) + "(" + basescore + " * " + multiplierString + ") !!";
+			gStatus = gLetters + " scores " + (Math.round(score * 100) / 100) + "(" + basescore + " * " + multiplierString + ") !!";
 
 			gMultiplier += .1;
 			gSnakeManager.ScoredWord(gLetters, basescore);
