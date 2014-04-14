@@ -1,7 +1,7 @@
 var gNeedsRedrawn = true;
 var INTERVAL_TIME = 20;
 var TIME_BETWEEN_SNAKE_MOVES = 100;
-var START_AS_LETTER_PERCENT = 5;
+var START_AS_LETTER_PERCENT = 0.05;
 var TIME_BETWEEN_LETTERS = 4000;
 var gGameBoard;
 var gSnakeManager;
@@ -15,6 +15,7 @@ var gStatus = "";
 var gAlreadyMovedSinceLastUpdate = false;
 
 var regOnce = false;
+var gAllowForceMove = false;
 
 // Directions 
 var DIRECTION =
@@ -26,7 +27,7 @@ var DIRECTION =
 	"NUM_DIRECTIONS": 4
 }
 
-var LETTERS = [	"A", "A", "A", "A", "A", "A", "A", "A", "A",
+var LETTERS = ["A", "A", "A", "A", "A", "A", "A", "A", "A",
 				"B", "B",
 				"C", "C",
 				"D", "D", "D", "D",
@@ -34,8 +35,8 @@ var LETTERS = [	"A", "A", "A", "A", "A", "A", "A", "A", "A",
 				"F", "F",
 				"G", "G", "G",
 				"H", "H",
-				"I", "I", "I", "I", "I", "I", "I", "I", "I", 
-				"J", 
+				"I", "I", "I", "I", "I", "I", "I", "I", "I",
+				"J",
 				"K",
 				"L", "L", "L", "L",
 				"M", "M",
@@ -50,9 +51,9 @@ var LETTERS = [	"A", "A", "A", "A", "A", "A", "A", "A", "A",
 				"V", "V",
 				"W", "W",
 				"X",
-				"Y", "Y", 
+				"Y", "Y",
 				"Z",
-				// "*", "*",
+// "*", "*",
 				];
 
 //-----------------------------------------------------------------------------
@@ -83,6 +84,11 @@ function Init()
 		alert(urlVars["word"] + " " + wordOk + " " + getScore(urlVars["word"]));
 	}
 
+	if (urlVars["forcemove"])
+	{
+		gAllowForceMove = true;
+	}
+
 	if (urlVars["speed"])
 	{
 		var asInt = parseInt(urlVars["speed"]);
@@ -102,7 +108,7 @@ function Init()
 	gScore = 0;
 	gMultiplier = 1;
 	gLetters = "";
-	
+
 	// get the canvas
 	var drawingCanvas = document.getElementById('myDrawing');
 
@@ -112,7 +118,7 @@ function Init()
 
 	// create the snake manager
 	gSnakeManager = new SnakeManager();
-	
+
 	// push starting index
 	gSnakeManager.m_snakePieces.push(0);
 
@@ -130,26 +136,26 @@ function Init()
 	{
 		// don't do this again or everything will go twice as fast
 		regOnce = true;
-		
+
 		// schedule snake updating
 		setInterval(MoveSnake, TIME_BETWEEN_SNAKE_MOVES);
-		
+
 		// schedule drawing
 		setInterval(Draw, INTERVAL_TIME);
-		
+
 		// schedule letter adding
 		setInterval(AddLetter, TIME_BETWEEN_LETTERS);
-		
+
 		// hook up events
 		window.addEventListener('keydown', ev_keydown, false);
 		drawingCanvas.addEventListener('mousedown', ev_mousedown, false);
 	}
-	
+
 
 	// is it too big
 	if (((LINE_LENGTH) * (NUM_COLS + 2)) + FONT_SIZE_PT > drawingCanvas.height)
 		alert("oops canvas isn't tall enough");
-	if(LINE_LENGTH * NUM_ROWS > drawingCanvas.width)
+	if (LINE_LENGTH * NUM_ROWS > drawingCanvas.width)
 		alert("oops canvas isn't wide enough");
 }
 
@@ -157,9 +163,20 @@ function Init()
 //-----------------------------------------------------------------------------
 function MoveSnake(force)
 {
-	if (force || !gAlreadyMovedSinceLastUpdate)
-		gSnakeManager.MoveSnake();
+	// head can move "on demand" or on the timer
+	var moveHead = force || !gAlreadyMovedSinceLastUpdate;
+
+	// tail always ticks on the timer
+	var moveTail = !force;
+
+	// do the move
+	gSnakeManager.MoveSnake(moveHead, moveTail);
+
+	// clear state flags
 	gAlreadyMovedSinceLastUpdate = false;
+
+	// we need to redraw after a move (everyone is setting this everywhere!)
+	gNeedsRedrawn = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +194,7 @@ function Draw()
 	{
 		// we need to redraw only once per state change
 		gNeedsRedrawn = false;
-		
+
 		// get the context
 		var context = drawingCanvas.getContext('2d');
 
@@ -189,7 +206,7 @@ function Draw()
 			var textX = 50;
 			var textY = (LINE_LENGTH) * (NUM_COLS + 2);
 
-			context.clearRect(textX, textY-(FONT_SIZE_PT*2), drawingCanvas.width, drawingCanvas.height);
+			context.clearRect(textX, textY - (FONT_SIZE_PT * 2), drawingCanvas.width, drawingCanvas.height);
 			context.font = FONT_SIZE_PT + "pt arial";
 			context.fillStyle = '#000';
 			context.fillText("LETTERS: " + gLetters, textX, textY);
@@ -206,7 +223,7 @@ function Draw()
 			context.fillStyle = '#000';
 
 			context.fillText("GAME OVER", textX, textY);
-			context.fillText("SCORE: " + Math.round(gScore*100)/100, textX, textY + FONT_SIZE_PT);
+			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + FONT_SIZE_PT);
 			context.fillText("CLICK TO START OVER", textX, textY + 2 * FONT_SIZE_PT);
 		}
 	}
@@ -235,9 +252,12 @@ function ev_keydown(ev)
 		gSnakeManager.ChangeDirection(ev.keyCode);
 		if (gSnakeManager.m_lastDirectionMoved != ev.keyCode)
 		{
-			MoveSnake(true);
-			gAlreadyMovedSinceLastUpdate = true;
-			gNeedsRedrawn = true;
+			if (gAllowForceMove && !gAlreadyMovedSinceLastUpdate)
+			{
+				MoveSnake(true);
+				gAlreadyMovedSinceLastUpdate = true;
+			}
+			//gNeedsRedrawn = true;
 		}
 	}
 	else if (ev.keyCode == 88 || ev.keyCode == 8) // x or backspace

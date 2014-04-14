@@ -13,40 +13,46 @@ function SnakeManager()
 	
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.MoveSnake = function()
+	this.MoveSnake = function (moveHead, moveTail)
 	{
 		var headIndex = this.m_snakePieces[0];
 		var tailIndex = this.m_snakePieces[this.m_snakePieces.length - 1];
 
-		var newHeadIdx = this.GetIndexOfNextInDirection();
-
-		// game over if you collide with yourself
-		if (gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece)
+		if (moveHead)
 		{
-			gGameOver = true;
+			var newHeadIdx = this.GetIndexOfNextInDirection();
+
+			// game over if you collide with yourself
+			if (gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece)
+			{
+				gGameOver = true;
+			}
+
+			// add letter to our list if we eat it!
+			if (gGameBoard.m_GamePieces[newHeadIdx].m_letter != '.')
+			{
+				gLetters += gGameBoard.m_GamePieces[newHeadIdx].m_letter;
+				this.m_maxLength += tileScore[gGameBoard.m_GamePieces[newHeadIdx].m_letter];
+				gGameBoard.m_GamePieces[newHeadIdx].m_letter = '.';
+			}
+
+			gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece = true;
+			this.m_snakePieces.unshift(newHeadIdx);
+
+			this.m_lastDirectionMoved = this.m_direction;
+			if (this.m_lastIntendedDirection != this.m_lastDirectionMoved)
+				this.ChangeDirection(this.m_lastIntendedDirection);
 		}
 
-		// add letter to our list if we eat it!
-		if (gGameBoard.m_GamePieces[newHeadIdx].m_letter != '.')
+		if (moveTail)
 		{
-			gLetters += gGameBoard.m_GamePieces[newHeadIdx].m_letter;
-			this.m_maxLength += tileScore[gGameBoard.m_GamePieces[newHeadIdx].m_letter];
-			gGameBoard.m_GamePieces[newHeadIdx].m_letter = '.';
+			while (this.m_snakePieces.length > this.m_maxLength)
+			{
+				gGameBoard.m_GamePieces[tailIndex].m_isSnakePiece = false;
+				this.m_snakePieces.pop();
+				tailIndex = this.m_snakePieces[this.m_snakePieces.length - 1];
+			}
 		}
-
-		gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece = true;
-		this.m_snakePieces.unshift(newHeadIdx);
-
-		while (this.m_snakePieces.length > this.m_maxLength)
-		{
-			gGameBoard.m_GamePieces[tailIndex].m_isSnakePiece = false;
-			this.m_snakePieces.pop();
-			tailIndex = this.m_snakePieces[this.m_snakePieces.length - 1];
-		}
-
-		this.m_lastDirectionMoved = this.m_direction;
-		if (this.m_lastIntendedDirection != this.m_lastDirectionMoved)
-			this.ChangeDirection(this.m_lastIntendedDirection);
 
 		// need to redraw
 		gNeedsRedrawn = true;
