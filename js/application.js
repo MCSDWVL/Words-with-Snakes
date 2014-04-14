@@ -89,6 +89,11 @@ function Init()
 		gAllowForceMove = true;
 	}
 
+	if (urlVars["size"])
+	{
+		NUM_ROWS = NUM_COLS = parseInt(urlVars["size"]);
+	}
+
 	if (urlVars["speed"])
 	{
 		var asInt = parseInt(urlVars["speed"]);
@@ -197,6 +202,7 @@ function Draw()
 
 		// get the context
 		var context = drawingCanvas.getContext('2d');
+		var fontSize = 25 * .6;
 
 		if (gGameOver == false)
 		{
@@ -204,27 +210,28 @@ function Draw()
 			gGameBoard.Draw(context);
 
 			var textX = 50;
-			var textY = (LINE_LENGTH) * (NUM_COLS + 2);
+			var textY = (25) * (NUM_COLS + 2);
 
-			context.clearRect(textX, textY - (FONT_SIZE_PT * 2), drawingCanvas.width, drawingCanvas.height);
-			context.font = FONT_SIZE_PT + "pt arial";
+			
+			context.clearRect(textX, textY - (fontSize * 2), drawingCanvas.width, drawingCanvas.height);
+			context.font = fontSize + "pt arial";
 			context.fillStyle = '#000';
 			context.fillText("LETTERS: " + gLetters, textX, textY);
-			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + FONT_SIZE_PT);
-			context.fillText("MULTIPLIER: " + Math.round(gMultiplier * 100) / 100, textX, textY + 2 * FONT_SIZE_PT);
-			context.fillText(gStatus, textX, textY + 3 * FONT_SIZE_PT);
+			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
+			context.fillText("MULTIPLIER: " + Math.round(gMultiplier * 100) / 100, textX, textY + 2 * fontSize);
+			context.fillText(gStatus, textX, textY + 3 * fontSize);
 		}
 		else
 		{
 			context.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
 			var textX = 50;
 			var textY = 50;
-			context.font = FONT_SIZE_PT + "pt arial";
+			context.font = fontSize + "pt arial";
 			context.fillStyle = '#000';
 
 			context.fillText("GAME OVER", textX, textY);
-			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + FONT_SIZE_PT);
-			context.fillText("CLICK TO START OVER", textX, textY + 2 * FONT_SIZE_PT);
+			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
+			context.fillText("CLICK TO START OVER", textX, textY + 2 * fontSize);
 		}
 	}
 }
@@ -316,6 +323,7 @@ function AddLetter()
 	if (randompiece.m_isSnakePiece || randompiece.m_letter != '.')
 		return;
 	randompiece.m_letter = randomletter;
+	randompiece.needsRedraw = true;
 }
 
 

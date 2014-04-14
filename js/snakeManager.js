@@ -37,6 +37,7 @@ function SnakeManager()
 			}
 
 			gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece = true;
+			gGameBoard.m_GamePieces[newHeadIdx].needsRedraw = true;
 			this.m_snakePieces.unshift(newHeadIdx);
 
 			this.m_lastDirectionMoved = this.m_direction;
@@ -49,6 +50,7 @@ function SnakeManager()
 			while (this.m_snakePieces.length > this.m_maxLength)
 			{
 				gGameBoard.m_GamePieces[tailIndex].m_isSnakePiece = false;
+				gGameBoard.m_GamePieces[tailIndex].needsRedraw = true;
 				this.m_snakePieces.pop();
 				tailIndex = this.m_snakePieces[this.m_snakePieces.length - 1];
 			}

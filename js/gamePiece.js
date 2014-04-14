@@ -1,10 +1,20 @@
-var LINE_LENGTH = 25;
-var LINE_WIDTH = LINE_LENGTH/50.0;
-var FONT_SIZE_PT = LINE_LENGTH * .6;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function GridPiece()
+function GridPiece(boardSize)
 {
+	if (isNaN(boardSize))
+	{
+		if (!isNaN(NUM_ROWS))
+			boardSize = NUM_ROWS;
+		else
+			boardSize = 25;
+	}
+
+	this.lineLength = 25 * (25 / boardSize);
+	this.lineWidth = this.lineLength / 50.0;
+	this.fontSize = this.lineLength * .6;
+	this.needsRedraw = true;
+
 	//
 	this.m_Row = -1;
 	this.m_Col = -1;
@@ -21,15 +31,15 @@ function GridPiece()
 	{
 		// all the vertices of the hex
 		x0 = this.GetX();
-		x1 = x0 + LINE_LENGTH;
+		x1 = x0 + this.lineLength;
 		y0 = this.GetY();
-		y1 = y0 + LINE_LENGTH;
+		y1 = y0 + this.lineLength;
 	}
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.GetHeight = function() { return LINE_LENGTH; }
-	this.GetWidth = function() { return LINE_LENGTH; }
+	this.GetHeight = function () { return this.lineLength; }
+	this.GetWidth = function () { return this.lineLength; }
 
 	//-----------------------------------------------------------------------------
 	// GetX - the left of the guy
@@ -82,7 +92,7 @@ function GridPiece()
 			context.fillStyle = '#fff';
 
 		context.strokeStyle = '#000';
-		context.lineWidth = LINE_WIDTH;
+		context.lineWidth = this.lineWidth;
 
 		context.beginPath();
 
@@ -102,15 +112,15 @@ function GridPiece()
 
 		if (this.m_letter != '.')
 		{
-			var textX = x0 + LINE_LENGTH / 5;
-			var textY = y0 + .8 * LINE_LENGTH;
-			context.font = FONT_SIZE_PT + "pt arial";
+			var textX = x0 + this.lineLength / 5;
+			var textY = y0 + .8 * this.lineLength;
+			context.font = this.fontSize + "pt arial";
 			context.fillStyle = '#000';
 			context.fillText(this.m_letter, textX, textY);
 
-			var scoreX = textX + FONT_SIZE_PT;
-			var scoreY = textY + LINE_WIDTH;
-			context.font = (FONT_SIZE_PT/2.5) + "pt arial";
+			var scoreX = textX + this.fontSize;
+			var scoreY = textY + this.lineLength;
+			context.font = (this.lineLength.fontSize / 2.5) + "pt arial";
 			context.fillStyle = '#000';
 			context.fillText(tileScore[this.m_letter], scoreX, scoreY);
 		}

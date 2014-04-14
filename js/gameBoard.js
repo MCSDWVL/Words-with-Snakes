@@ -8,13 +8,21 @@ function GameBoard()
 	//-----------------------------------------------------------------------------
 	// Draw - just pass on to all the game pieces?
 	//-----------------------------------------------------------------------------
-	this.Draw = function(context)
+	this.Draw = function (context)
 	{
+		var drawn = 0;
 		for (var i = 0; i < this.m_GamePieces.length; ++i)
 		{
-			var color = false;
-			this.m_GamePieces[i].Draw(context, color);
+			if (this.m_GamePieces[i].needsRedraw)
+			{
+				++drawn;
+				this.m_GamePieces[i].needsRedraw = false;
+				var color = false;
+				this.m_GamePieces[i].Draw(context, color);
+			}
 		}
+
+		//console.log("drew " + drawn);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -49,7 +57,4 @@ function GameBoard()
 		}
 		gNeedsRedrawn = true;
 	}
-	
-	
-	
 }
