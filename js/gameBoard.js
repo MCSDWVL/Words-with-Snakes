@@ -4,6 +4,7 @@
 function GameBoard()
 {
 	this.m_GamePieces = new Array();
+	this.activePieceSize = Math.round(BOARD_SIZE / NUM_ROWS - SPACING - LINE_WIDTH);
 	
 	//-----------------------------------------------------------------------------
 	// Draw - just pass on to all the game pieces?
@@ -27,7 +28,7 @@ function GameBoard()
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.GamePieceIndexPieceAtRowCol = function(row, col)
+	this.GamePieceIndexPieceAtRowCol = function (row, col)
 	{
 		// wrap down to valid row and col
 		if (row < 0) row = NUM_ROWS + row;
@@ -41,6 +42,20 @@ function GameBoard()
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
+	this.BoardSideSize = function ()
+	{
+		return NUM_ROWS * (this.PieceTotalSize());
+	}
+
+	//-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
+	this.PieceTotalSize = function()
+	{
+		return this.activePieceSize + SPACING + LINE_WIDTH;
+	}
+
+	//-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	this.InitEmptyGrid = function()
 	{
 		var ctr = 0;
@@ -48,7 +63,7 @@ function GameBoard()
 		{
 			for (var col = 0; col < NUM_COLS; ++col)
 			{
-				var gp = new GridPiece();
+				var gp = new GridPiece(this.activePieceSize, SPACING, LINE_WIDTH);
 				gp.m_Row = row;
 				gp.m_Col = col;
 				gp.EstablishPoints();

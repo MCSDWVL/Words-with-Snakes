@@ -1,19 +1,12 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function GridPiece(boardSize)
+function GridPiece(pieceActiveWidth, spacing, lineWidth)
 {
-	if (isNaN(boardSize))
-	{
-		if (!isNaN(NUM_ROWS))
-			boardSize = NUM_ROWS;
-		else
-			boardSize = 25;
-	}
-
-	this.lineLength = 25 * (25 / boardSize);
-	this.lineWidth = this.lineLength / 50.0;
+	this.lineLength = pieceActiveWidth;
+	this.lineWidth = lineWidth;
 	this.fontSize = this.lineLength * .6;
 	this.needsRedraw = true;
+	this.spacing = spacing;
 
 	//
 	this.m_Row = -1;
@@ -27,19 +20,22 @@ function GridPiece(boardSize)
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.EstablishPoints = function() 
+	this.EstablishPoints = function ()
 	{
-		// all the vertices of the hex
-		x0 = this.GetX();
+		// all the vertices
+		var upperLeftOfTotalSpaceX = this.GetX();
+		var upperLeftOfTotalSpaceY = this.GetY();
+
+		x0 = upperLeftOfTotalSpaceX + this.spacing/2;
 		x1 = x0 + this.lineLength;
-		y0 = this.GetY();
+		y0 = upperLeftOfTotalSpaceY + this.spacing/2;
 		y1 = y0 + this.lineLength;
 	}
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.GetHeight = function () { return this.lineLength; }
-	this.GetWidth = function () { return this.lineLength; }
+	this.GetHeight = function () { return this.lineLength + this.spacing + this.lineWidth; }
+	this.GetWidth = function () { return this.lineLength + this.spacing + this.lineWidth; }
 
 	//-----------------------------------------------------------------------------
 	// GetX - the left of the guy
@@ -77,32 +73,28 @@ function GridPiece(boardSize)
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.Draw = function(context, colorIt)
+	this.Draw = function (context, colorIt)
 	{
 		// Set the style properties
 		if (this.m_isSnakePiece)
-		{
-			context.fillStyle = '#111';
-		}
+			context.fillStyle = '#F11';
 		else if (this.m_letter != '.')
-		{
 			context.fillStyle = '#FF0';
-		}
 		else
 			context.fillStyle = '#fff';
 
-		context.strokeStyle = '#000';
+		context.clearRect(this.GetX(), this.GetY(), this.GetWidth(), this.GetHeight());
+		context.strokeStyle = '#aaa';
 		context.lineWidth = this.lineWidth;
 
 		context.beginPath();
 
 		// Start from the top-left point.
-
 		context.moveTo(x0, y0);
 		context.lineTo(x1, y0); // lower
 		context.lineTo(x1, y1); // right
 		context.lineTo(x0, y1); // upper
-		context.lineTo(x0, y0); // left
+		context.lineTo(x0, y0);// - this.lineWidth / 2); // left
 
 		// Done! Now fill the shape, and draw the stroke.
 		// Note: your shape will not be visible until you call any of the two methods.
@@ -118,9 +110,9 @@ function GridPiece(boardSize)
 			context.fillStyle = '#000';
 			context.fillText(this.m_letter, textX, textY);
 
-			var scoreX = textX + this.fontSize;
-			var scoreY = textY + this.lineLength;
-			context.font = (this.lineLength.fontSize / 2.5) + "pt arial";
+			var scoreX = textX + this.fontSize / 1.2;
+			var scoreY = textY + this.lineLength / 6;
+			context.font = (this.fontSize / 2.0) + "pt arial";
 			context.fillStyle = '#000';
 			context.fillText(tileScore[this.m_letter], scoreX, scoreY);
 		}

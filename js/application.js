@@ -7,6 +7,10 @@ var gGameBoard;
 var gSnakeManager;
 var NUM_ROWS = 25;
 var NUM_COLS = 25;
+var SPACING = 1;
+var LINE_WIDTH = 1;
+var BOARD_SIZE = 25 * 25;
+
 var gGameOver = false;
 var gScore = 0;
 var gMultiplier = 1;
@@ -158,9 +162,9 @@ function Init()
 
 
 	// is it too big
-	if (((LINE_LENGTH) * (NUM_COLS + 2)) + FONT_SIZE_PT > drawingCanvas.height)
+	if (gGameBoard.BoardSideSize() > drawingCanvas.height)
 		alert("oops canvas isn't tall enough");
-	if (LINE_LENGTH * NUM_ROWS > drawingCanvas.width)
+	if (gGameBoard.BoardSideSize() > drawingCanvas.width)
 		alert("oops canvas isn't wide enough");
 }
 
@@ -210,7 +214,7 @@ function Draw()
 			gGameBoard.Draw(context);
 
 			var textX = 50;
-			var textY = (25 * (25 / NUM_COLS)) * (NUM_COLS) + 50;
+			var textY = gGameBoard.BoardSideSize() + 50;
 			
 			context.clearRect(textX, textY - (fontSize * 2), drawingCanvas.width, drawingCanvas.height);
 			context.font = fontSize + "pt arial";
