@@ -21,6 +21,8 @@ var gAlreadyMovedSinceLastUpdate = false;
 var regOnce = false;
 var gAllowForceMove = false;
 
+var scoreHolder = document.querySelector(".score");
+
 // Directions 
 var DIRECTION =
 {
@@ -160,7 +162,6 @@ function Init()
 		drawingCanvas.addEventListener('mousedown', ev_mousedown, false);
 	}
 
-
 	// is it too big
 	if (gGameBoard.BoardSideSize() > drawingCanvas.height)
 		alert("oops canvas isn't tall enough");
@@ -221,6 +222,7 @@ function Draw()
 			context.fillStyle = '#000';
 			context.fillText("LETTERS: " + gLetters, textX, textY);
 			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
+			ActuateScore();
 			context.fillText("MULTIPLIER: " + Math.round(gMultiplier * 100) / 100, textX, textY + 2 * fontSize);
 			context.fillText(gStatus, textX, textY + 3 * fontSize);
 		}
@@ -237,6 +239,13 @@ function Draw()
 			context.fillText("CLICK TO START OVER", textX, textY + 2 * fontSize);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+function ActuateScore()
+{
+	scoreHolder.innerText = Math.round(gScore);
 }
 
 //-----------------------------------------------------------------------------
