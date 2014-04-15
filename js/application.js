@@ -1,7 +1,7 @@
 var gNeedsRedrawn = true;
 var INTERVAL_TIME = 20;
 var TIME_BETWEEN_SNAKE_MOVES = 100;
-var START_AS_LETTER_PERCENT = 0.05;
+var START_AS_LETTER_PERCENT = 0.01;
 var TIME_BETWEEN_LETTERS = 4000;
 var gGameBoard;
 var gSnakeManager;
@@ -210,8 +210,7 @@ function Draw()
 			gGameBoard.Draw(context);
 
 			var textX = 50;
-			var textY = (25) * (NUM_COLS + 2);
-
+			var textY = (25 * (25 / NUM_COLS)) * (NUM_COLS) + 50;
 			
 			context.clearRect(textX, textY - (fontSize * 2), drawingCanvas.width, drawingCanvas.height);
 			context.font = fontSize + "pt arial";
