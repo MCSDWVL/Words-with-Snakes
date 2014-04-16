@@ -394,7 +394,7 @@ function AddLetter(init)
 
 	var randomletter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
 	var randompiece = gGameBoard.m_GamePieces[Math.floor(Math.random() * gGameBoard.m_GamePieces.length)];
-	if (randompiece.m_isSnakePiece || randompiece.m_letter != '.')
+	if (randompiece.m_letter != '.')
 		return;
 	randompiece.m_letter = randomletter;
 	if (!init)
