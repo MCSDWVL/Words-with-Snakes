@@ -11,8 +11,8 @@
 {
 	position:relative;
 	top:170;
-	width:100%;
-	height:100%;
+	/*width:100%;*/
+	/*height:100%;*/
 	text-align:center;
 
 	margin-left:auto;
@@ -20,4 +20,57 @@
 	font-family:Arial;
 	font-size:200pt;
 	color:rgba(0,0,0,0.2);
+}
+
+.letters
+{
+	position:relative;
+	text-align:center;
+	top:100;
+
+	margin-left:auto;
+	margin-right:auto;
+	font-family:Arial;
+	font-size:75pt;
+	color:rgba(0,0,0,0.2);
+}
+
+.goodword
+{
+	-webkit-animation: goodwordanim 0.5s linear; /* Chrome, Safari, Opera */
+	animation: goodwordanim 0.5s linear infinite;
+}
+
+.badword
+{
+	-webkit-animation: badwordanim 0.5s linear; /* Chrome, Safari, Opera */
+	animation: badwordanim 0.5s linear infinite;
+}
+
+@-webkit-keyframes goodwordanim
+{
+	0%   {color: rgba(0,0,0,0.2); }
+	75%  {color: rgba(0,255,0,0.2);}
+	100% {color: rgba(0,0,0,0.2);}
+}
+
+@keyframes goodwordanim
+{
+	0%   {color: rgba(0,0,0,0.2); }
+	75%  {color: rgba(0,255,0,0.2);}
+	100% {color: rgba(0,0,0,0.2);}
+}
+
+@-webkit-keyframes badwordanim
+{
+	0%   {color: rgba(0,0,0,0.2); }
+	75%  {color: rgba(255,0,0,0.2);}
+	100% {color: rgba(0,0,0,0.2);}
+}
+
+@keyframes badwordanim
+{
+	0%   {color: rgba(0,0,0,0.2); }
+	75%  {color: rgba(255,0,0,0.2);}
+	100% {color: rgba(0,0,0,0.2);}
 }

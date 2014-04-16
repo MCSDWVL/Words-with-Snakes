@@ -20,8 +20,10 @@ var gAlreadyMovedSinceLastUpdate = false;
 
 var regOnce = false;
 var gAllowForceMove = false;
+var gRemoveSnakeSectionsOnSend = false;
 
 var scoreHolder = document.querySelector(".score");
+var lettersHolder = document.querySelector(".letters");
 
 // Directions 
 var DIRECTION =
@@ -223,6 +225,7 @@ function Draw()
 			context.fillText("LETTERS: " + gLetters, textX, textY);
 			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
 			ActuateScore();
+			ActuateLetters();
 			context.fillText("MULTIPLIER: " + Math.round(gMultiplier * 100) / 100, textX, textY + 2 * fontSize);
 			context.fillText(gStatus, textX, textY + 3 * fontSize);
 		}
@@ -246,6 +249,32 @@ function Draw()
 function ActuateScore()
 {
 	scoreHolder.innerText = Math.round(gScore);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+function ActuateLetters()
+{
+	lettersHolder.innerText = gLetters;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+function ActuateInvalidWord()
+{
+	scoreHolder.className = scoreHolder.className.replace(" badword", "");
+	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
+	setTimeout(function () { scoreHolder.className += " badword" }, 0.01);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+function ActuateValidWord()
+{
+	scoreHolder.className = scoreHolder.className.replace(" badword", "");
+	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
+
+	setTimeout(function() { scoreHolder.className += " goodword"}, 0.01);
 }
 
 //-----------------------------------------------------------------------------
@@ -303,15 +332,16 @@ function ev_keydown(ev)
 			gStatus = gLetters + " scores " + (Math.round(score * 100) / 100) + "(" + basescore + " * " + multiplierString + ") !!";
 
 			gMultiplier += .1;
-			gSnakeManager.ScoredWord(gLetters, basescore);
+			gSnakeManager.ScoredWord(gLetters, basescore, gRemoveSnakeSectionsOnSend);
 			gScore += score;
-
+			ActuateValidWord();
 		}
 		else
 		{
 			gStatus = gLetters + " is not a word !!";
-			gMultiplier = 1;
+			ActuateInvalidWord();
 		}
+		
 		//gScore += (validWord) ? score : -score;
 		gLetters = "";
 		gNeedsRedrawn = true;

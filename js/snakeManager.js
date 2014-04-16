@@ -62,11 +62,11 @@ function SnakeManager()
 
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	this.ScoredWord = function(letters, score)
+	this.ScoredWord = function(letters, score, remove)
 	{
 		var diff = score - letters.length;
 		console.log(letters + " " + score + " " + diff);
-		if (diff > 0)
+		if (diff > 0 && remove)
 		{
 			this.m_maxLength -= 2 * diff;
 			console.log("Getting rid of " + 2 * diff + " pieces " + this.m_maxLength);
