@@ -161,7 +161,7 @@ function Init()
 
 		// hook up events
 		window.addEventListener('keydown', ev_keydown, false);
-		drawingCanvas.addEventListener('mousedown', ev_mousedown, false);
+		window.addEventListener('mousedown', ev_mousedown, false);
 	}
 
 	// is it too big
@@ -258,23 +258,26 @@ function ActuateLetters()
 	lettersHolder.innerText = gLetters;
 }
 
+function CleanScoreClasses()
+{
+	scoreHolder.className = scoreHolder.className.replace(" badword", "");
+	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function ActuateInvalidWord()
 {
-	scoreHolder.className = scoreHolder.className.replace(" badword", "");
-	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
-	setTimeout(function () { scoreHolder.className += " badword" }, 0.01);
+	scoreHolder.className += " badword";
+	setTimeout(CleanScoreClasses, 500);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function ActuateValidWord()
 {
-	scoreHolder.className = scoreHolder.className.replace(" badword", "");
-	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
-
-	setTimeout(function() { scoreHolder.className += " goodword"}, 0.01);
+	scoreHolder.className += " goodword";
+	setTimeout(CleanScoreClasses, 500);
 }
 
 //-----------------------------------------------------------------------------
@@ -288,12 +291,6 @@ function NeedToRedraw()
 //-----------------------------------------------------------------------------
 function ev_keydown(ev)
 {
-	//console.log(ev.keyCode);
-	if (gGameOver)
-	{
-		Init();
-		return;
-	}
 	if (ev.keyCode >= DIRECTION.LEFT && ev.keyCode <= DIRECTION.DOWN)
 	{
 		ev.preventDefault();
