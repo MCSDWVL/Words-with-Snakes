@@ -13,6 +13,7 @@ function GridPiece(pieceActiveWidth, spacing, lineWidth)
 	this.m_Col = -1;
 	this.m_isSnakePiece = false;
 	this.m_letter = '.';
+	this.isGhostPiece = false;
 	
 	// define some of the positions around the hex that we'll need later
 	var x0, x1;
@@ -78,6 +79,8 @@ function GridPiece(pieceActiveWidth, spacing, lineWidth)
 		// Set the style properties
 		if (this.m_isSnakePiece)
 			context.fillStyle = '#F11';
+		else if (this.m_letter != "." && this.isGhostPiece)
+			context.fillStyle = '#aaa';
 		else if (this.m_letter != '.')
 			context.fillStyle = '#FF0';
 		else

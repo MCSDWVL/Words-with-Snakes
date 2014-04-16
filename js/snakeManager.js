@@ -30,7 +30,7 @@ function SnakeManager()
 			}
 
 			// add letter to our list if we eat it!
-			if (gGameBoard.m_GamePieces[newHeadIdx].m_letter != '.')
+			if (gGameBoard.m_GamePieces[newHeadIdx].m_letter != '.' && !gGameBoard.m_GamePieces[newHeadIdx].isGhostPiece)
 			{
 				gLetters += gGameBoard.m_GamePieces[newHeadIdx].m_letter;
 				this.m_maxLength += tileScore[gGameBoard.m_GamePieces[newHeadIdx].m_letter];

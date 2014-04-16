@@ -151,10 +151,10 @@ function Init()
 	// push starting index
 	gSnakeManager.m_snakePieces.push(0);
 
-	// init 5% of the board to letters
+	// init X% of the board to letters
 	for (var i = 0; i < NUM_ROWS * NUM_COLS * START_AS_LETTER_PERCENT; ++i)
 	{
-		AddLetter();
+		AddLetter(true);
 	}
 
 	// schedule drawing
@@ -382,14 +382,28 @@ function ev_mousedown(ev)
 }
 
 //-----------------------------------------------------------------------------
-function AddLetter()
+var gGhostLetter;
+function AddLetter(init)
 {
+	if (gGhostLetter)
+	{
+		gGhostLetter.isGhostPiece = false;
+		gGhostLetter.needsRedraw = true;
+		gGhostLetter = null;
+	}
+
 	var randomletter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
 	var randompiece = gGameBoard.m_GamePieces[Math.floor(Math.random() * gGameBoard.m_GamePieces.length)];
 	if (randompiece.m_isSnakePiece || randompiece.m_letter != '.')
 		return;
 	randompiece.m_letter = randomletter;
+	if (!init)
+	{
+		randompiece.isGhostPiece = true;
+		gGhostLetter = randompiece;
+	}
 	randompiece.needsRedraw = true;
+	
 }
 
 
