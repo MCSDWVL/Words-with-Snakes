@@ -1,8 +1,8 @@
 var gNeedsRedrawn = true;
-var INTERVAL_TIME = 20;
-var TIME_BETWEEN_SNAKE_MOVES = 100;
+var DRAW_RATE = 1/60; // 60 fps?
+var TIME_BETWEEN_SNAKE_MOVES = 1000/15;
 var START_AS_LETTER_PERCENT = 0.01;
-var TIME_BETWEEN_LETTERS = 4000;
+var TIME_BETWEEN_LETTERS = 2000;
 var gGameBoard;
 var gSnakeManager;
 var NUM_ROWS = 25;
@@ -22,8 +22,13 @@ var regOnce = false;
 var gAllowForceMove = false;
 var gRemoveSnakeSectionsOnSend = false;
 
+var gTimeLimit = -1;
+var gCountDownTime = -1;
+var gTimerUpdateHandle;
+
 var scoreHolder = document.querySelector(".score");
 var lettersHolder = document.querySelector(".letters");
+var timerHolder = document.querySelector(".timer");
 
 // Directions 
 var DIRECTION =
@@ -65,7 +70,6 @@ var LETTERS = ["A", "A", "A", "A", "A", "A", "A", "A", "A",
 				];
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 function getUrlVars()
 {
 	var vars = [], hash;
@@ -80,28 +84,31 @@ function getUrlVars()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 function Init()
 {
 	// get url vals
 	var urlVars = getUrlVars();
 
+	// check word?
 	if (urlVars["word"])
 	{
 		var wordOk = checkDictionary(urlVars["word"]);
 		alert(urlVars["word"] + " " + wordOk + " " + getScore(urlVars["word"]));
 	}
 
+	// allow instant update on direction change
 	if (urlVars["forcemove"])
 	{
 		gAllowForceMove = true;
 	}
 
+	// size of board
 	if (urlVars["size"])
 	{
 		NUM_ROWS = NUM_COLS = parseInt(urlVars["size"]);
 	}
 
+	// speed of snake
 	if (urlVars["speed"])
 	{
 		var asInt = parseInt(urlVars["speed"]);
@@ -109,11 +116,20 @@ function Init()
 			TIME_BETWEEN_SNAKE_MOVES = 1000 / asInt;
 	}
 
+	// starting letter percent
 	if (urlVars["pct"])
 	{
 		var asInt = parseInt(urlVars["pct"]);
 		if (!isNaN(asInt))
 			START_AS_LETTER_PERCENT = asInt / 100.0;
+	}
+
+	// time limit
+	if (urlVars["limit"])
+	{
+		var asInt = parseInt(urlVars["limit"]);
+		if(!isNaN(asInt))
+			gTimeLimit = asInt;
 	}
 
 	// reset game state
@@ -154,7 +170,7 @@ function Init()
 		setInterval(MoveSnake, TIME_BETWEEN_SNAKE_MOVES);
 
 		// schedule drawing
-		setInterval(Draw, INTERVAL_TIME);
+		setInterval(Draw, DRAW_RATE);
 
 		// schedule letter adding
 		setInterval(AddLetter, TIME_BETWEEN_LETTERS);
@@ -164,6 +180,14 @@ function Init()
 		window.addEventListener('mousedown', ev_mousedown, false);
 	}
 
+	// is there a timer?!
+	if (gTimeLimit > 0)
+	{
+		setTimeout(function () { gGameOver = true; gCountDownTime = -1; clearInterval(gTimerUpdateHandle); ActuateTimer(); analytics.trackEvent("game", "over", "time", gScore); }, gTimeLimit * 1000);
+		gCountDownTime = gTimeLimit;
+		gTimerUpdateHandle = setInterval(function () { gCountDownTime -= 1; }, 1000);
+	}
+
 	// is it too big
 	if (gGameBoard.BoardSideSize() > drawingCanvas.height)
 		alert("oops canvas isn't tall enough");
@@ -171,7 +195,6 @@ function Init()
 		alert("oops canvas isn't wide enough");
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function MoveSnake(force)
 {
@@ -193,7 +216,6 @@ function MoveSnake(force)
 
 //-----------------------------------------------------------------------------
 // draw everything if state has changed
-//-----------------------------------------------------------------------------
 function Draw()
 {
 	// don't do anything if state hasn't changed
@@ -226,25 +248,28 @@ function Draw()
 			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
 			ActuateScore();
 			ActuateLetters();
+			ActuateTimer();
+
 			context.fillText("MULTIPLIER: " + Math.round(gMultiplier * 100) / 100, textX, textY + 2 * fontSize);
 			context.fillText(gStatus, textX, textY + 3 * fontSize);
 		}
 		else
 		{
 			context.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-			var textX = 50;
-			var textY = 50;
-			context.font = fontSize + "pt arial";
-			context.fillStyle = '#000';
-
-			context.fillText("GAME OVER", textX, textY);
-			context.fillText("SCORE: " + Math.round(gScore * 100) / 100, textX, textY + fontSize);
-			context.fillText("CLICK TO START OVER", textX, textY + 2 * fontSize);
+			ActuateLetters("GAME OVER \n CLICK TO RETRY");
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
+function ActuateTimer()
+{
+	if (gCountDownTime > 0)
+		timerHolder.innerText = Math.round(gCountDownTime);
+	else
+		timerHolder.innerText = "";
+}
+
 //-----------------------------------------------------------------------------
 function ActuateScore()
 {
@@ -252,19 +277,21 @@ function ActuateScore()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-function ActuateLetters()
+function ActuateLetters(forceText)
 {
-	lettersHolder.innerText = gLetters;
+	if(!forceText)
+		lettersHolder.innerText = gLetters;
+	else
+		lettersHolder.innerText = forceText;
 }
 
+//-----------------------------------------------------------------------------
 function CleanScoreClasses()
 {
 	scoreHolder.className = scoreHolder.className.replace(" badword", "");
 	scoreHolder.className = scoreHolder.className.replace(" goodword", "");
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function ActuateInvalidWord()
 {
@@ -273,7 +300,6 @@ function ActuateInvalidWord()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 function ActuateValidWord()
 {
 	scoreHolder.className += " goodword";
@@ -281,13 +307,11 @@ function ActuateValidWord()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 function NeedToRedraw()
 {
 	gNeedsRedrawn = true;
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function ev_keydown(ev)
 {
@@ -330,11 +354,13 @@ function ev_keydown(ev)
 
 			gMultiplier += .1;
 			gSnakeManager.ScoredWord(gLetters, basescore, gRemoveSnakeSectionsOnSend);
+			analytics.trackEvent("score", "success", gLetters, score);
 			gScore += score;
 			ActuateValidWord();
 		}
 		else
 		{
+			analytics.trackEvent("score", "failure", gLetters);
 			gStatus = gLetters + " is not a word !!";
 			ActuateInvalidWord();
 		}
@@ -346,14 +372,15 @@ function ev_keydown(ev)
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 function ev_mousedown(ev)
 {
 	if (gGameOver)
+	{
+		analytics.trackEvent("game", "start", "restart");
 		Init();
+	}
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function AddLetter()
 {

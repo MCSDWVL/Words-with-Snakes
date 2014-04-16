@@ -26,6 +26,7 @@ function SnakeManager()
 			if (gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece)
 			{
 				gGameOver = true;
+				analytics.trackEvent("game", "over", "collide", gScore);
 			}
 
 			// add letter to our list if we eat it!

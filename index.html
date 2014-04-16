@@ -10,10 +10,13 @@
 		<div class="score-outer">
 			<div class="score">1234</div>
 			<div class="letters">xxxxx</div>
+			<div class="timer"></div>
 		</div>
     </body>
 </html>
 
+<script src="js/analytics.js"></script>
+<script>window.analytics = new Analytics('UA-49710691-2', 'mcsdwvl.github.io');</script>
 <script src="js/long_dict.js"></script>
 <script src="js/dictionary.js"></script>
 <!--<script src="premadeboards.js"></script>-->
@@ -23,5 +26,6 @@
 <script src="js/application.js"></script>
 
 <script language=javascript>
+	analytics.trackEvent("game", "start", "first");
     Init();  
 </script>
