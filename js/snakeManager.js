@@ -23,7 +23,7 @@ function SnakeManager()
 			var newHeadIdx = this.GetIndexOfNextInDirection();
 
 			// game over if you collide with yourself
-			if (gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece)
+			if (gGameBoard.m_GamePieces[newHeadIdx].m_isSnakePiece && !gGameOver)
 			{
 				gGameOver = true;
 				analytics.trackEvent("game", "over", "collide", gScore);
