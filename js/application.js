@@ -26,6 +26,8 @@ var gTimeLimit = -1;
 var gCountDownTime = -1;
 var gTimerUpdateHandle;
 
+var gSnakeLengthBasedOnLetterValue = false;
+
 var scoreHolder = document.querySelector(".score");
 var lettersHolder = document.querySelector(".letters");
 var timerHolder = document.querySelector(".timer");

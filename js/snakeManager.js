@@ -33,7 +33,7 @@ function SnakeManager()
 			if (gGameBoard.m_GamePieces[newHeadIdx].m_letter != '.' && !gGameBoard.m_GamePieces[newHeadIdx].isGhostPiece)
 			{
 				gLetters += gGameBoard.m_GamePieces[newHeadIdx].m_letter;
-				this.m_maxLength += tileScore[gGameBoard.m_GamePieces[newHeadIdx].m_letter];
+				this.m_maxLength += gSnakeLengthBasedOnLetterValue ? tileScore[gGameBoard.m_GamePieces[newHeadIdx].m_letter] : 1;
 				gGameBoard.m_GamePieces[newHeadIdx].m_letter = '.';
 			}
 
