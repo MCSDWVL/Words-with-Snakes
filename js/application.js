@@ -341,6 +341,13 @@ function ev_keydown(ev)
 	else if (ev.keyCode == 32) // space
 	{
 		ev.preventDefault();
+
+		if (gGameOver)
+		{
+			Init();
+			return;
+		}
+
 		var wordOk = checkDictionary(gLetters);
 		var validWord = checkDictionary(gLetters);
 		if (validWord)
